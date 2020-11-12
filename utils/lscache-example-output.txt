@@ -1,0 +1,345 @@
+System {
+    cpu0 {
+        index0 {
+            level:                   1
+            type:                    Data
+            id:                      0
+            shared w/ CPUs:          0-1
+            line size:               64
+            associativity:           8
+            sets:                    64
+            total size:              32K
+        }
+        index1 {
+            level:                   1
+            type:                    Instruction
+            id:                      0
+            shared w/ CPUs:          0-1
+            line size:               64
+            associativity:           4
+            sets:                    256
+            total size:              64K
+        }
+        index2 {
+            level:                   2
+            type:                    Unified
+            id:                      0
+            shared w/ CPUs:          0-1
+            line size:               64
+            associativity:           8
+            sets:                    1024
+            total size:              512K
+        }
+        index3 {
+            level:                   3
+            type:                    Unified
+            id:                      0
+            shared w/ CPUs:          0-7
+            line size:               64
+            associativity:           16
+            sets:                    4096
+            total size:              4096K
+        }
+    }
+}
+    cpu1 {
+        index0 {
+            level:                   1
+            type:                    Data
+            id:                      0
+            shared w/ CPUs:          0-1
+            line size:               64
+            associativity:           8
+            sets:                    64
+            total size:              32K
+        }
+        index1 {
+            level:                   1
+            type:                    Instruction
+            id:                      0
+            shared w/ CPUs:          0-1
+            line size:               64
+            associativity:           4
+            sets:                    256
+            total size:              64K
+        }
+        index2 {
+            level:                   2
+            type:                    Unified
+            id:                      0
+            shared w/ CPUs:          0-1
+            line size:               64
+            associativity:           8
+            sets:                    1024
+            total size:              512K
+        }
+        index3 {
+            level:                   3
+            type:                    Unified
+            id:                      0
+            shared w/ CPUs:          0-7
+            line size:               64
+            associativity:           16
+            sets:                    4096
+            total size:              4096K
+        }
+    }
+}
+    cpu2 {
+        index0 {
+            level:                   1
+            type:                    Data
+            id:                      1
+            shared w/ CPUs:          2-3
+            line size:               64
+            associativity:           8
+            sets:                    64
+            total size:              32K
+        }
+        index1 {
+            level:                   1
+            type:                    Instruction
+            id:                      1
+            shared w/ CPUs:          2-3
+            line size:               64
+            associativity:           4
+            sets:                    256
+            total size:              64K
+        }
+        index2 {
+            level:                   2
+            type:                    Unified
+            id:                      1
+            shared w/ CPUs:          2-3
+            line size:               64
+            associativity:           8
+            sets:                    1024
+            total size:              512K
+        }
+        index3 {
+            level:                   3
+            type:                    Unified
+            id:                      0
+            shared w/ CPUs:          0-7
+            line size:               64
+            associativity:           16
+            sets:                    4096
+            total size:              4096K
+        }
+    }
+}
+    cpu3 {
+        index0 {
+            level:                   1
+            type:                    Data
+            id:                      1
+            shared w/ CPUs:          2-3
+            line size:               64
+            associativity:           8
+            sets:                    64
+            total size:              32K
+        }
+        index1 {
+            level:                   1
+            type:                    Instruction
+            id:                      1
+            shared w/ CPUs:          2-3
+            line size:               64
+            associativity:           4
+            sets:                    256
+            total size:              64K
+        }
+        index2 {
+            level:                   2
+            type:                    Unified
+            id:                      1
+            shared w/ CPUs:          2-3
+            line size:               64
+            associativity:           8
+            sets:                    1024
+            total size:              512K
+        }
+        index3 {
+            level:                   3
+            type:                    Unified
+            id:                      0
+            shared w/ CPUs:          0-7
+            line size:               64
+            associativity:           16
+            sets:                    4096
+            total size:              4096K
+        }
+    }
+}
+    cpu4 {
+        index0 {
+            level:                   1
+            type:                    Data
+            id:                      2
+            shared w/ CPUs:          4-5
+            line size:               64
+            associativity:           8
+            sets:                    64
+            total size:              32K
+        }
+        index1 {
+            level:                   1
+            type:                    Instruction
+            id:                      2
+            shared w/ CPUs:          4-5
+            line size:               64
+            associativity:           4
+            sets:                    256
+            total size:              64K
+        }
+        index2 {
+            level:                   2
+            type:                    Unified
+            id:                      2
+            shared w/ CPUs:          4-5
+            line size:               64
+            associativity:           8
+            sets:                    1024
+            total size:              512K
+        }
+        index3 {
+            level:                   3
+            type:                    Unified
+            id:                      0
+            shared w/ CPUs:          0-7
+            line size:               64
+            associativity:           16
+            sets:                    4096
+            total size:              4096K
+        }
+    }
+}
+    cpu5 {
+        index0 {
+            level:                   1
+            type:                    Data
+            id:                      2
+            shared w/ CPUs:          4-5
+            line size:               64
+            associativity:           8
+            sets:                    64
+            total size:              32K
+        }
+        index1 {
+            level:                   1
+            type:                    Instruction
+            id:                      2
+            shared w/ CPUs:          4-5
+            line size:               64
+            associativity:           4
+            sets:                    256
+            total size:              64K
+        }
+        index2 {
+            level:                   2
+            type:                    Unified
+            id:                      2
+            shared w/ CPUs:          4-5
+            line size:               64
+            associativity:           8
+            sets:                    1024
+            total size:              512K
+        }
+        index3 {
+            level:                   3
+            type:                    Unified
+            id:                      0
+            shared w/ CPUs:          0-7
+            line size:               64
+            associativity:           16
+            sets:                    4096
+            total size:              4096K
+        }
+    }
+}
+    cpu6 {
+        index0 {
+            level:                   1
+            type:                    Data
+            id:                      3
+            shared w/ CPUs:          6-7
+            line size:               64
+            associativity:           8
+            sets:                    64
+            total size:              32K
+        }
+        index1 {
+            level:                   1
+            type:                    Instruction
+            id:                      3
+            shared w/ CPUs:          6-7
+            line size:               64
+            associativity:           4
+            sets:                    256
+            total size:              64K
+        }
+        index2 {
+            level:                   2
+            type:                    Unified
+            id:                      3
+            shared w/ CPUs:          6-7
+            line size:               64
+            associativity:           8
+            sets:                    1024
+            total size:              512K
+        }
+        index3 {
+            level:                   3
+            type:                    Unified
+            id:                      0
+            shared w/ CPUs:          0-7
+            line size:               64
+            associativity:           16
+            sets:                    4096
+            total size:              4096K
+        }
+    }
+}
+    cpu7 {
+        index0 {
+            level:                   1
+            type:                    Data
+            id:                      3
+            shared w/ CPUs:          6-7
+            line size:               64
+            associativity:           8
+            sets:                    64
+            total size:              32K
+        }
+        index1 {
+            level:                   1
+            type:                    Instruction
+            id:                      3
+            shared w/ CPUs:          6-7
+            line size:               64
+            associativity:           4
+            sets:                    256
+            total size:              64K
+        }
+        index2 {
+            level:                   2
+            type:                    Unified
+            id:                      3
+            shared w/ CPUs:          6-7
+            line size:               64
+            associativity:           8
+            sets:                    1024
+            total size:              512K
+        }
+        index3 {
+            level:                   3
+            type:                    Unified
+            id:                      0
+            shared w/ CPUs:          0-7
+            line size:               64
+            associativity:           16
+            sets:                    4096
+            total size:              4096K
+        }
+    }
+}
