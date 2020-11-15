@@ -1,0 +1,8 @@
+# This is a sourced bash script
+# These are example values for L1 size, L2 size, and L3 size
+#   adjust appropriately
+# The 'utils/lscache.sh' script may be useful in assigning appropriate values
+STRESSNG_L1_SIZE="32768"
+STRESSNG_L2_SIZE="524288"
+STRESSNG_L3_SIZE="4194304"
+
