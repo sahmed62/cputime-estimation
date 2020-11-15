@@ -1,0 +1,757 @@
+
+# this file is meant to be sourced from other bash scripts
+
+# each of these functions should take a 
+
+STRESS_NG_COMMONARGS="--page-in --log-brief --sched fifo --sched-prio 9"
+
+#*******************************************************************************
+#   CPU workloads
+#*******************************************************************************
+
+function stress-ng-ackermann {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--cpu-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    stress-ng   --cpu 1                 \
+                --cpu-method ackermann  \
+                ${STRESS_NG_COMMONARGS} \
+                ${OPSARG}               \
+                "$@"
+}
+
+function stress-ng-hamming {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--cpu-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    stress-ng   --cpu 1                 \
+                --cpu-method hamming    \
+                ${STRESS_NG_COMMONARGS} \
+                ${OPSARG}               \
+                "$@"
+}
+
+function stress-ng-gray {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--cpu-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    stress-ng   --cpu 1                 \
+                --cpu-method gray       \
+                ${STRESS_NG_COMMONARGS} \
+                ${OPSARG}               \
+                "$@"
+}
+
+function stress-ng-hanoi {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--cpu-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    stress-ng   --cpu 1                 \
+                --cpu-method hanoi      \
+                ${STRESS_NG_COMMONARGS} \
+                ${OPSARG}               \
+                "$@"
+}
+
+#*******************************************************************************
+#   Branch-intensive workloads
+#*******************************************************************************
+
+function stress-ng-branch {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--branch-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    stress-ng   --branch 1              \
+                ${STRESS_NG_COMMONARGS} \
+                ${OPSARG}               \
+                "$@"
+}
+
+function stress-ng-longjmp {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--longjmp-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    stress-ng   --longjmp 1             \
+                ${STRESS_NG_COMMONARGS} \
+                ${OPSARG}               \
+                "$@"
+}
+
+function stress-ng-funccall {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--funccall-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    stress-ng   --funccall 1            \
+                ${STRESS_NG_COMMONARGS} \
+                ${OPSARG}               \
+                "$@"
+}
+
+function stress-ng-funcret {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--branch-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    stress-ng   --funcret 1             \
+                ${STRESS_NG_COMMONARGS} \
+                ${OPSARG}               \
+                "$@"
+}
+
+#*******************************************************************************
+#   Cache/Memory-bound workloads
+#
+#   We include the config file, cache-config.sh.include, if it exists in the
+#   present working directory. This include file is expected to include
+#   "STRESSNG_L1_SIZE", "STRESSNG_L2_SIZE", and "STRESSNG_L3_SIZE".
+#
+#   -the workloads labeled L1 will aim for working-set size that's 90% of the
+#   L1 size
+#
+#   - the workloads labeled L2 will aim for working-set size that's 90% of the
+#   L2 size
+#
+#   - the workloads labeled L3 will aim for working-set size that's 90% of the
+#   L3 size
+#
+#   - the workloads labeled mem will aim for working-set size that's 800% of the
+#   L3 size
+#
+#*******************************************************************************
+
+function get_size_param {
+    if [ -r "cache-config.sh.include" ] ; then
+        source "cache-config.sh.include"
+    fi
+    # by default assume L1 of size 32k at ~ 90% : 30k
+    local SIZE_RET="32768"
+    if [ ${1} == "1" ] && [ ! -z "${STRESSNG_L1_SIZE}" ] ; then
+         SIZE_RET="${STRESSNG_L1_SIZE}"
+    elif [ ${1} == "2" ] && [ ! -z "${STRESSNG_L2_SIZE}" ] ; then
+         SIZE_RET="${STRESSNG_L2_SIZE}"
+    elif [ ${1} == "3" ] && [ ! -z "${STRESSNG_L3_SIZE}" ] ; then
+         SIZE_RET="${STRESSNG_L3_SIZE}"
+    elif [ ${1} == "4" ] ; then
+        # 4 refers to LLC miss: aim for at least 8xLLC size
+        if [ ! -z "${STRESSNG_L3_SIZE}" ] ; then
+            SIZE_RET="$( expr ${STRESSNG_L3_SIZE} '*' 8 )"
+        elif [ ! -z "${STRESSNG_L2_SIZE}" ] ; then
+            SIZE_RET="$( expr ${STRESSNG_L2_SIZE} '*' 64 )"
+        elif [ ! -z "${STRESSNG_L1_SIZE}" ] ; then
+            SIZE_RET="$( expr ${STRESSNG_L1_SIZE} '*' 512 )"
+        else
+            SIZE_RET="$( expr ${SIZE_RET} '*' 512 )"
+        fi
+    fi
+    # whatever we have so far, set to 90%
+    SIZE_RET="$( expr ${SIZE_RET} '*' 90 )"
+    SIZE_RET="$( expr ${SIZE_RET} / 100 )"
+    echo $SIZE_RET
+}
+
+function stress-ng-cache-l1 {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--cache-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    stress-ng   --cache 1               \
+                --cache-level 1         \
+                --cache-no-affinity     \
+                ${STRESS_NG_COMMONARGS} \
+                ${OPSARG}               \
+                "$@"
+}
+
+
+function stress-ng-cache-l2 {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--cache-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    stress-ng   --cache 1               \
+                --cache-level 2         \
+                --cache-no-affinity     \
+                ${STRESS_NG_COMMONARGS} \
+                ${OPSARG}               \
+                "$@"
+}
+
+function stress-ng-cache-l3 {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--cache-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    stress-ng   --cache 1               \
+                --cache-level 3         \
+                --cache-no-affinity     \
+                ${STRESS_NG_COMMONARGS} \
+                ${OPSARG}               \
+                "$@"
+}
+
+function stress-ng-stream-mem {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--stream-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    if [ -r "cache-config.sh.include" ] ; then
+        source "cache-config.sh.include"
+    fi
+    if [ ! -z "${STRESSNG_L3_SIZE}" ] ; then
+        L3SIZEARG="--stream-l3-size ${STRESSNG_L3_SIZE}"
+    else
+        L3SIZEARG=""
+    fi
+    stress-ng   --stream 1              \
+                --stream-index 3        \
+                ${L3SIZEARG}            \
+                --stream-madvise normal \
+                ${STRESS_NG_COMMONARGS} \
+                ${OPSARG}               \
+                "$@"
+}
+
+function stress-ng-memrate-mem {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--memrate-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    WORKING_SET_SIZE="$( get_size_param 4 )"
+    stress-ng   --memrate 1                         \
+                --memrate-bytes ${WORKING_SET_SIZE} \
+                ${STRESS_NG_COMMONARGS}             \
+                ${OPSARG}                           \
+                "$@"
+}
+
+function stress-ng-matrix-mult-l1 {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--matrix-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    WORKING_SET_SIZE="$( get_size_param 1 )"
+    MATRIXSIZ="$( expr ${WORKING_SET_SIZE} / 4)"
+    MATRIXDIM="$(echo "sqrt ( ${MATRIXSIZ} )" | bc )"
+    stress-ng   --matrix 1                  \
+                --matrix-size ${MATRIXDIM}  \
+                --matrix-method mult        \
+                ${STRESS_NG_COMMONARGS}     \
+                ${OPSARG}                   \
+                "$@"
+}
+
+function stress-ng-matrix-mult-l2 {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--matrix-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    WORKING_SET_SIZE="$( get_size_param 2 )"
+    MATRIXSIZ="$( expr ${WORKING_SET_SIZE} / 4)"
+    MATRIXDIM="$(echo "sqrt ( ${MATRIXSIZ} )" | bc )"
+    stress-ng   --matrix 1                  \
+                --matrix-size ${MATRIXDIM}  \
+                --matrix-method mult        \
+                ${STRESS_NG_COMMONARGS}     \
+                ${OPSARG}                   \
+                "$@"
+}
+
+function stress-ng-matrix-mult-l3 {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--matrix-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    WORKING_SET_SIZE="$( get_size_param 3 )"
+    MATRIXSIZ="$( expr ${WORKING_SET_SIZE} / 4)"
+    MATRIXDIM="$(echo "sqrt ( ${MATRIXSIZ} )" | bc )"
+    stress-ng   --matrix 1                  \
+                --matrix-size ${MATRIXDIM}  \
+                --matrix-method mult        \
+                ${STRESS_NG_COMMONARGS}     \
+                ${OPSARG}                   \
+                "$@"
+}
+
+function stress-ng-matrix-mult-mem {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--matrix-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    WORKING_SET_SIZE="$( get_size_param 4 )"
+    MATRIXSIZ="$( expr ${WORKING_SET_SIZE} / 4)"
+    MATRIXDIM="$(echo "sqrt ( ${MATRIXSIZ} )" | bc )"
+    stress-ng   --matrix 1                  \
+                --matrix-size ${MATRIXDIM}  \
+                --matrix-method mult        \
+                ${STRESS_NG_COMMONARGS}     \
+                ${OPSARG}                   \
+                "$@"
+}
+
+function stress-ng-matrix-trans-l1 {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--matrix-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    WORKING_SET_SIZE="$( get_size_param 1 )"
+    MATRIXSIZ="$( expr ${WORKING_SET_SIZE} / 4)"
+    MATRIXDIM="$(echo "sqrt ( ${MATRIXSIZ} )" | bc )"
+    stress-ng   --matrix 1                  \
+                --matrix-size ${MATRIXDIM}  \
+                --matrix-method trans       \
+                ${STRESS_NG_COMMONARGS}     \
+                ${OPSARG}                   \
+                "$@"
+}
+
+function stress-ng-matrix-trans-l2 {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--matrix-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    WORKING_SET_SIZE="$( get_size_param 2 )"
+    MATRIXSIZ="$( expr ${WORKING_SET_SIZE} / 4)"
+    MATRIXDIM="$(echo "sqrt ( ${MATRIXSIZ} )" | bc )"
+    stress-ng   --matrix 1                  \
+                --matrix-size ${MATRIXDIM}  \
+                --matrix-method trans       \
+                ${STRESS_NG_COMMONARGS}     \
+                ${OPSARG}                   \
+                "$@"
+}
+
+function stress-ng-matrix-trans-l3 {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--matrix-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    WORKING_SET_SIZE="$( get_size_param 3 )"
+    MATRIXSIZ="$( expr ${WORKING_SET_SIZE} / 4)"
+    MATRIXDIM="$(echo "sqrt ( ${MATRIXSIZ} )" | bc )"
+    stress-ng   --matrix 1                  \
+                --matrix-size ${MATRIXDIM}  \
+                --matrix-method trans       \
+                ${STRESS_NG_COMMONARGS}     \
+                ${OPSARG}                   \
+                "$@"
+}
+
+function stress-ng-matrix-trans-mem {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--matrix-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    WORKING_SET_SIZE="$( get_size_param 4 )"
+    MATRIXSIZ="$( expr ${WORKING_SET_SIZE} / 4)"
+    MATRIXDIM="$(echo "sqrt ( ${MATRIXSIZ} )" | bc )"
+    stress-ng   --matrix 1                  \
+                --matrix-size ${MATRIXDIM}  \
+                --matrix-method trans       \
+                ${STRESS_NG_COMMONARGS}     \
+                ${OPSARG}                   \
+                "$@"
+}
+
+function stress-ng-matrix-add-l1 {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--matrix-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    WORKING_SET_SIZE="$( get_size_param 1 )"
+    MATRIXSIZ="$( expr ${WORKING_SET_SIZE} / 4)"
+    MATRIXDIM="$(echo "sqrt ( ${MATRIXSIZ} )" | bc )"
+    stress-ng   --matrix 1                  \
+                --matrix-size ${MATRIXDIM}  \
+                --matrix-method add         \
+                ${STRESS_NG_COMMONARGS}     \
+                ${OPSARG}                   \
+                "$@"
+}
+
+function stress-ng-matrix-add-l2 {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--matrix-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    WORKING_SET_SIZE="$( get_size_param 2 )"
+    MATRIXSIZ="$( expr ${WORKING_SET_SIZE} / 4)"
+    MATRIXDIM="$(echo "sqrt ( ${MATRIXSIZ} )" | bc )"
+    stress-ng   --matrix 1                  \
+                --matrix-size ${MATRIXDIM}  \
+                --matrix-method add         \
+                ${STRESS_NG_COMMONARGS}     \
+                ${OPSARG}                   \
+                "$@"
+}
+
+function stress-ng-matrix-add-l3 {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--matrix-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    WORKING_SET_SIZE="$( get_size_param 3 )"
+    MATRIXSIZ="$( expr ${WORKING_SET_SIZE} / 4)"
+    MATRIXDIM="$(echo "sqrt ( ${MATRIXSIZ} )" | bc )"
+    stress-ng   --matrix 1                  \
+                --matrix-size ${MATRIXDIM}  \
+                --matrix-method add         \
+                ${STRESS_NG_COMMONARGS}     \
+                ${OPSARG}                   \
+                "$@"
+}
+
+function stress-ng-matrix-add-mem {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--matrix-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    WORKING_SET_SIZE="$( get_size_param 4 )"
+    MATRIXSIZ="$( expr ${WORKING_SET_SIZE} / 4)"
+    MATRIXDIM="$(echo "sqrt ( ${MATRIXSIZ} )" | bc )"
+    stress-ng   --matrix 1                  \
+                --matrix-size ${MATRIXDIM}  \
+                --matrix-method add         \
+                ${STRESS_NG_COMMONARGS}     \
+                ${OPSARG}                   \
+                "$@"
+}
+
+function stress-ng-matrix-prod-l1 {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--matrix-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    WORKING_SET_SIZE="$( get_size_param 1 )"
+    MATRIXSIZ="$( expr ${WORKING_SET_SIZE} / 4)"
+    MATRIXDIM="$(echo "sqrt ( ${MATRIXSIZ} )" | bc )"
+    stress-ng   --matrix 1                  \
+                --matrix-size ${MATRIXDIM}  \
+                --matrix-method prod        \
+                ${STRESS_NG_COMMONARGS}     \
+                ${OPSARG}                   \
+                "$@"
+}
+
+function stress-ng-matrix-prod-l2 {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--matrix-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    WORKING_SET_SIZE="$( get_size_param 2 )"
+    MATRIXSIZ="$( expr ${WORKING_SET_SIZE} / 4)"
+    MATRIXDIM="$(echo "sqrt ( ${MATRIXSIZ} )" | bc )"
+    stress-ng   --matrix 1                  \
+                --matrix-size ${MATRIXDIM}  \
+                --matrix-method prod        \
+                ${STRESS_NG_COMMONARGS}     \
+                ${OPSARG}                   \
+                "$@"
+}
+
+function stress-ng-matrix-prod-l3 {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--matrix-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    WORKING_SET_SIZE="$( get_size_param 3 )"
+    MATRIXSIZ="$( expr ${WORKING_SET_SIZE} / 4)"
+    MATRIXDIM="$(echo "sqrt ( ${MATRIXSIZ} )" | bc )"
+    stress-ng   --matrix 1                  \
+                --matrix-size ${MATRIXDIM}  \
+                --matrix-method prod        \
+                ${STRESS_NG_COMMONARGS}     \
+                ${OPSARG}                   \
+                "$@"
+}
+
+function stress-ng-matrix-prod-mem {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--matrix-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    WORKING_SET_SIZE="$( get_size_param 4 )"
+    MATRIXSIZ="$( expr ${WORKING_SET_SIZE} / 4)"
+    MATRIXDIM="$(echo "sqrt ( ${MATRIXSIZ} )" | bc )"
+    stress-ng   --matrix 1                  \
+                --matrix-size ${MATRIXDIM}  \
+                --matrix-method prod        \
+                ${STRESS_NG_COMMONARGS}     \
+                ${OPSARG}                   \
+                "$@"
+}
+
+#*******************************************************************************
+#   
+#*******************************************************************************
+
+function stress-ng-tree-rb-mem {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--tree-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    WORKING_SET_SIZE="$( get_size_param 4 )"
+    # Need to store a 64-bit value and two pointers per node
+    TREESIZ="$( expr ${WORKING_SET_SIZE} / 24)"
+    stress-ng   --tree 1                        \
+                --tree-size ${TREESIZ}          \
+                --tree-method rb                \
+                ${STRESS_NG_COMMONARGS}         \
+                ${OPSARG}                       \
+                "$@"    
+}
+
+function stress-ng-tree-binary-mem {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--tree-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    WORKING_SET_SIZE="$( get_size_param 4 )"
+    # Need to store a 64-bit value and two pointers per node
+    TREESIZ="$( expr ${WORKING_SET_SIZE} / 24)"
+    stress-ng   --tree 1                        \
+                --tree-size ${TREESIZ}          \
+                --tree-method binary            \
+                ${STRESS_NG_COMMONARGS}         \
+                ${OPSARG}                       \
+                "$@"    
+}
+
+function stress-ng-heapsort-mem {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--heapsort-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    # 4194304 is maximum size allowed
+    stress-ng   --heapsort 1            \
+                --heapsort-size 4194304 \
+                ${STRESS_NG_COMMONARGS} \
+                ${OPSARG}               \
+                "$@"
+}
+
+function stress-ng-mergesort-mem {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--mergesort-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    # 4194304 is maximum size allowed
+    stress-ng   --mergesort 1               \
+                --mergesort-size 4194304    \
+                ${STRESS_NG_COMMONARGS}     \
+                ${OPSARG}                   \
+                "$@"
+}
+
+function stress-ng-qsort-mem {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--qsort-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    # 4194304 is maximum size allowed
+    stress-ng   --qsort 1                   \
+                --qsort-size 4194304        \
+                ${STRESS_NG_COMMONARGS}     \
+                ${OPSARG}                   \
+                "$@"
+}
+
+function stress-ng-radixsort-mem {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--radixsort-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    # 4194304 is maximum size allowed
+    stress-ng   --radixsort 1               \
+                --radixsort-size 4194304    \
+                ${STRESS_NG_COMMONARGS}     \
+                ${OPSARG}                   \
+                "$@"
+}
+
+function stress-ng-skiplist-mem {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--skiplist-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    # 4194304 is maximum size allowed
+    stress-ng   --skiplist 1            \
+                --skiplist-size 4194304 \
+                ${STRESS_NG_COMMONARGS} \
+                ${OPSARG}               \
+                "$@"
+}
+
+function stress-ng-lsearch-mem {
+    if [ $# -gt "1" ] && [ $1 == "--ops" ] ; then
+        local OPSARG="--lsearch-ops $2"
+        shift 2
+    else
+        OPSARG=""
+    fi
+    # 4194304 is maximum size allowed
+    stress-ng   --lsearch 1             \
+                --lsearch-size 4194304  \
+                ${STRESS_NG_COMMONARGS} \
+                ${OPSARG}               \
+                "$@"
+}
+
+# Export all of these function
+export -f get_size_param
+
+export -f stress-ng-ackermann
+export -f stress-ng-hamming
+export -f stress-ng-gray
+export -f stress-ng-hanoi
+export -f stress-ng-branch
+export -f stress-ng-longjmp
+export -f stress-ng-funccall
+export -f stress-ng-funcret
+export -f stress-ng-cache-l1
+export -f stress-ng-cache-l2
+export -f stress-ng-cache-l3
+export -f stress-ng-stream-mem
+export -f stress-ng-memrate-mem
+export -f stress-ng-matrix-mult-l1
+export -f stress-ng-matrix-mult-l2
+export -f stress-ng-matrix-mult-l3
+export -f stress-ng-matrix-mult-mem
+export -f stress-ng-matrix-trans-l1
+export -f stress-ng-matrix-trans-l2
+export -f stress-ng-matrix-trans-l3
+export -f stress-ng-matrix-trans-mem
+export -f stress-ng-matrix-add-l1
+export -f stress-ng-matrix-add-l2
+export -f stress-ng-matrix-add-l3
+export -f stress-ng-matrix-add-mem
+export -f stress-ng-matrix-prod-l1
+export -f stress-ng-matrix-prod-l2
+export -f stress-ng-matrix-prod-l3
+export -f stress-ng-matrix-prod-mem
+export -f stress-ng-tree-rb-mem
+export -f stress-ng-tree-binary-mem
+export -f stress-ng-heapsort-mem
+export -f stress-ng-mergesort-mem
+export -f stress-ng-qsort-mem
+export -f stress-ng-radixsort-mem
+export -f stress-ng-skiplist-mem
+export -f stress-ng-lsearch-mem
+
+# Create a function array
+STRESSNG_FUNC_ARRAY=(   "stress-ng-ackermann"   \
+                        "stress-ng-hamming"     \
+                        "stress-ng-gray"        \
+                        "stress-ng-hanoi"       \
+                        "stress-ng-branch"      \
+                        "stress-ng-longjmp"     \
+                        "stress-ng-funccall"    \
+                        "stress-ng-funcret"     \
+                        "stress-ng-cache-l1"    \
+                        "stress-ng-cache-l2"    \
+                        "stress-ng-cache-l3"    \
+                        "stress-ng-stream-mem"      \
+                        "stress-ng-memrate-mem"     \
+                        "stress-ng-matrix-mult-l1"  \
+                        "stress-ng-matrix-mult-l2"  \
+                        "stress-ng-matrix-mult-l3"  \
+                        "stress-ng-matrix-mult-mem" \
+                        "stress-ng-matrix-trans-l1" \
+                        "stress-ng-matrix-trans-l2" \
+                        "stress-ng-matrix-trans-l3" \
+                        "stress-ng-matrix-trans-mem"\
+                        "stress-ng-matrix-add-l1"   \
+                        "stress-ng-matrix-add-l2"   \
+                        "stress-ng-matrix-add-l3"   \
+                        "stress-ng-matrix-add-mem"  \
+                        "stress-ng-matrix-prod-l1"  \
+                        "stress-ng-matrix-prod-l2"  \
+                        "stress-ng-matrix-prod-l3"  \
+                        "stress-ng-matrix-prod-mem" \
+                        "stress-ng-tree-rb-mem"     \
+                        "stress-ng-tree-binary-mem" \
+                        "stress-ng-heapsort-mem"    \
+                        "stress-ng-mergesort-mem"   \
+                        "stress-ng-qsort-mem"       \
+                        "stress-ng-radixsort-mem"   \
+                        "stress-ng-skiplist-mem"    \
+                        "stress-ng-lsearch-mem"   )
+
