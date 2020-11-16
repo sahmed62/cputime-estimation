@@ -1,0 +1,42 @@
+
+# this file is meant to be sourced from other bash scripts
+
+# Create a function array
+STRESSNG_FUNC_ARRAY=(   "ackermann"         \
+                        "hamming"           \
+                        "gray"              \
+                        "hanoi"             \
+                        "branch"            \
+                        "longjmp"           \
+                        "funccall"          \
+                        "funcret"           \
+                        "cache-l1"          \
+                        "cache-l2"          \
+                        "cache-l3"          \
+                        "stream-mem"        \
+                        "memrate-mem"       \
+                        "matrix-mult-l1"    \
+                        "matrix-mult-l2"    \
+                        "matrix-mult-l3"    \
+                        "matrix-mult-mem"   \
+                        "matrix-trans-l1"   \
+                        "matrix-trans-l2"   \
+                        "matrix-trans-l3"   \
+                        "matrix-trans-mem"  \
+                        "matrix-add-l1"     \
+                        "matrix-add-l2"     \
+                        "matrix-add-l3"     \
+                        "matrix-add-mem"    \
+                        "matrix-prod-l1"    \
+                        "matrix-prod-l2"    \
+                        "matrix-prod-l3"    \
+                        "matrix-prod-mem"   \
+                        "tree-rb-mem"       \
+                        "tree-binary-mem"   \
+                        "heapsort-mem"      \
+                        "mergesort-mem"     \
+                        "qsort-mem"         \
+                        "radixsort-mem"     \
+                        "skiplist-mem"      \
+                        "lsearch-mem"   )
+
