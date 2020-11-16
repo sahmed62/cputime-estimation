@@ -1,0 +1,150 @@
+# This is a sourced bash script
+# These are example values for perf stat events
+#   adjust appropriately
+# Run 'perf list' on the host to see list of available events
+PERF_STAT_EVENT_LIST="duration_time,cpu-cycles,instructions,branch-instructions,branch-misses,L1-icache-loads,L1-icache-misses,L1-dcache-loads,L1-dcache-misses,l3_lookup_state.all_l3_req_typs,xi_ccx_sdp_req1.all_l3_miss_req_typs"
+
+#
+# The following two variables are arrays of equal length
+#   - The first array is an array cores
+#   - The second array is an array of events measured on that core
+#
+# Since the same core can have different events and the same event can occur
+# on different cores, the entries should only be unique when considered in
+# combination.
+#
+# The following example is generated from a sample run of the perf-stress-ng
+# container image with the PERF_STAT_EVENT_LIST variable as shown above
+#
+# On a four-core 8-thread machine, the following command was run
+#
+# docker run -it \
+#           --rm \
+#           --privileged \
+#           --cpuset-cpus 7 \
+#           -v $(pwd):/home/perf-stress-ng perf-stress-ng:latest \
+#           matrix-prod-mem \
+#           -t 10 -q
+#
+# Example output:
+#
+# S0-D0-C0;1;10015268265;ns;duration_time;10015268265;100.00;;
+# S0-D0-C0;2;1530419765;;cpu-cycles;11125487074;55.55;;
+# S0-D0-C0;2;700462015;;instructions;11125451003;55.55;0.46;insn per cycle
+# S0-D0-C0;2;144547263;;branch-instructions;11127141301;55.56;;
+# S0-D0-C0;2;5429649;;branch-misses;11128931406;55.56;3.76;of all branches
+# S0-D0-C0;2;213854822;;L1-icache-loads;11130120248;55.57;;
+# S0-D0-C0;2;13663947;;L1-icache-misses;11129988220;55.57;6.39;of all L1-icache hits
+# S0-D0-C0;2;331304237;;L1-dcache-loads;11128259091;55.56;;
+# S0-D0-C0;2;16760087;;L1-dcache-misses;11126296604;55.55;5.06;of all L1-dcache hits
+# S0-D0-C0;1;17308145;;l3_lookup_state.all_l3_req_typs;10013851383;100.00;;
+# S0-D0-C0;1;161955877;;xi_ccx_sdp_req1.all_l3_miss_req_typs;10013851553;100.00;;
+# S0-D0-C1;0;<not counted>;ns;duration_time;0;100.00;;
+# S0-D0-C1;2;567118400;;cpu-cycles;11125495856;55.55;;
+# S0-D0-C1;2;293559730;;instructions;11125435265;55.55;0.52;insn per cycle
+# S0-D0-C1;2;60161595;;branch-instructions;11127075180;55.55;;
+# S0-D0-C1;2;2244053;;branch-misses;11128827610;55.56;3.73;of all branches
+# S0-D0-C1;2;107606620;;L1-icache-loads;11130124290;55.57;;
+# S0-D0-C1;2;4623271;;L1-icache-misses;11129915063;55.57;4.30;of all L1-icache hits
+# S0-D0-C1;2;135040597;;L1-dcache-loads;11128238662;55.56;;
+# S0-D0-C1;2;5435911;;L1-dcache-misses;11126324859;55.55;4.03;of all L1-dcache hits
+# S0-D0-C1;0;<not counted>;;l3_lookup_state.all_l3_req_typs;0;100.00;;
+# S0-D0-C1;0;<not counted>;;xi_ccx_sdp_req1.all_l3_miss_req_typs;0;100.00;;
+# S0-D0-C2;0;<not counted>;ns;duration_time;0;100.00;;
+# S0-D0-C2;2;569967586;;cpu-cycles;11125446796;55.55;;
+# S0-D0-C2;2;313674889;;instructions;11125238253;55.54;0.55;insn per cycle
+# S0-D0-C2;2;64246910;;branch-instructions;11126954836;55.55;;
+# S0-D0-C2;2;2492058;;branch-misses;11128704683;55.56;3.88;of all branches
+# S0-D0-C2;2;115028561;;L1-icache-loads;11130252019;55.57;;
+# S0-D0-C2;2;4620492;;L1-icache-misses;11129933291;55.57;4.02;of all L1-icache hits
+# S0-D0-C2;2;144119460;;L1-dcache-loads;11128311704;55.56;;
+# S0-D0-C2;2;6212281;;L1-dcache-misses;11126396080;55.55;4.31;of all L1-dcache hits
+# S0-D0-C2;0;<not counted>;;l3_lookup_state.all_l3_req_typs;0;100.00;;
+# S0-D0-C2;0;<not counted>;;xi_ccx_sdp_req1.all_l3_miss_req_typs;0;100.00;;
+# S0-D0-C3;0;<not counted>;ns;duration_time;0;100.00;;
+# S0-D0-C3;2;69169680763;;cpu-cycles;11125561626;55.55;;
+# S0-D0-C3;2;20162194624;;instructions;11125407931;55.55;0.29;insn per cycle
+# S0-D0-C3;2;2534119783;;branch-instructions;11126969887;55.55;;
+# S0-D0-C3;2;10245814;;branch-misses;11128705736;55.56;0.40;of all branches
+# S0-D0-C3;2;163738081;;L1-icache-loads;11129923163;55.57;;
+# S0-D0-C3;2;9806543;;L1-icache-misses;11129858588;55.57;5.99;of all L1-icache hits
+# S0-D0-C3;2;7384685221;;L1-dcache-loads;11128378967;55.56;;
+# S0-D0-C3;2;2514007715;;L1-dcache-misses;11126314155;55.55;34.04;of all L1-dcache hits
+# S0-D0-C3;0;<not counted>;;l3_lookup_state.all_l3_req_typs;0;100.00;;
+# S0-D0-C3;0;<not counted>;;xi_ccx_sdp_req1.all_l3_miss_req_typs;0;100.00;;
+#
+#   Based on the above output, the followning array definitions are written
+#   manually.
+#
+PERF_STAT_OUTPUT_PARSE_CORELIST=(   "S0-D0-C0"  \
+                                    "S0-D0-C3"  \
+                                    "S0-D0-C3"  \
+                                    "S0-D0-C3"  \
+                                    "S0-D0-C3"  \
+                                    "S0-D0-C3"  \
+                                    "S0-D0-C3"  \
+                                    "S0-D0-C3"  \
+                                    "S0-D0-C3"  \
+                                    "S0-D0-C0"  \
+                                    "S0-D0-C0"  \
+                                    "S0-D0-C0"  \
+                                    "S0-D0-C0"  \
+                                    "S0-D0-C0"  \
+                                    "S0-D0-C0"  \
+                                    "S0-D0-C1"  \
+                                    "S0-D0-C1"  \
+                                    "S0-D0-C1"  \
+                                    "S0-D0-C1"  \
+                                    "S0-D0-C2"  \
+                                    "S0-D0-C2"  \
+                                    "S0-D0-C2"  \
+                                    "S0-D0-C2")
+
+PERF_STAT_OUTPUT_PARSE_EVENTLIST=(  "duration_time"                         \
+                                    "cpu-cycles"                            \
+                                    "instructions"                          \
+                                    "branch-instructions"                   \
+                                    "branch-misses"                         \
+                                    "L1-icache-loads"                       \
+                                    "L1-icache-misses"                      \
+                                    "L1-dcache-loads"                       \
+                                    "L1-dcache-misses"                      \
+                                    "l3_lookup_state"                       \
+                                    "xi_ccx_sdp_req1.all_l3_miss_req_typs"  \
+                                    "cpu-cycles"                            \
+                                    "instructions"                          \
+                                    "L1-icache-misses"                      \
+                                    "L1-dcache-misses"                      \
+                                    "cpu-cycles"                            \
+                                    "instructions"                          \
+                                    "L1-icache-misses"                      \
+                                    "L1-dcache-misses"                      \
+                                    "cpu-cycles"                            \
+                                    "instructions"                          \
+                                    "L1-icache-misses"                      \
+                                    "L1-dcache-misses")
+
+PERF_STAT_OUTPUT_PARSE_LABELLIST=(  "duration (ns)"                         \
+                                    "Core 3 cpu cycles"                     \
+                                    "Core 3 instructions"                   \
+                                    "Core 3 branch instructions"            \
+                                    "Core 3 branch misses"                  \
+                                    "Core 3 L1 i-cache loads"               \
+                                    "Core 3 L1 i-cache misses"              \
+                                    "Core 3 L1 d-cache loads"               \
+                                    "Core 3 L1 d-cache misses"              \
+                                    "L3 cache loads"                        \
+                                    "L3 cache misses"                       \
+                                    "Core 0 cpu cycles"                     \
+                                    "Core 0 instructions"                   \
+                                    "Core 0 L1 i-cache misses"              \
+                                    "Core 0 L1 d-cache misses"              \
+                                    "Core 1 cpu cycles"                     \
+                                    "Core 1 instructions"                   \
+                                    "Core 1 L1 i-cache misses"              \
+                                    "Core 1 L1 d-cache misses"              \
+                                    "Core 2 cpu cycles"                     \
+                                    "Core 2 instructions"                   \
+                                    "Core 2 L1 i-cache misses"              \
+                                    "Core 2 L1 d-cache misses")
+
