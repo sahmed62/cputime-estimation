@@ -1,4 +1,4 @@
-FROM debian:buster-slim
+FROM ubuntu:20.04
 
 MAINTAINER Safayet Ahmed <sahmed62@<JHU domain name>>
 
@@ -11,7 +11,10 @@ MAINTAINER Safayet Ahmed <sahmed62@<JHU domain name>>
 RUN set -ex \
         &&  apt update                  \
         &&  apt install -y              \
-                linux-perf              \
+                bc                      \
+                linux-tools-common      \
+                linux-tools-lowlatency  \
+                linux-cloud-tools-lowlatency    \
                 stress-ng               \
         &&  rm -rf /var/lib/apt/lists/* \
         &&  mkdir /home/perf-stress-ng
