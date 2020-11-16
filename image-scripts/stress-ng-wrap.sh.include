@@ -1,8 +1,6 @@
 
 # this file is meant to be sourced from other bash scripts
 
-# each of these functions should take a 
-
 STRESS_NG_COMMONARGS="--page-in --log-brief --sched fifo --sched-prio 9"
 
 #*******************************************************************************
@@ -715,43 +713,4 @@ export -f stress-ng-qsort-mem
 export -f stress-ng-radixsort-mem
 export -f stress-ng-skiplist-mem
 export -f stress-ng-lsearch-mem
-
-# Create a function array
-STRESSNG_FUNC_ARRAY=(   "stress-ng-ackermann"   \
-                        "stress-ng-hamming"     \
-                        "stress-ng-gray"        \
-                        "stress-ng-hanoi"       \
-                        "stress-ng-branch"      \
-                        "stress-ng-longjmp"     \
-                        "stress-ng-funccall"    \
-                        "stress-ng-funcret"     \
-                        "stress-ng-cache-l1"    \
-                        "stress-ng-cache-l2"    \
-                        "stress-ng-cache-l3"    \
-                        "stress-ng-stream-mem"      \
-                        "stress-ng-memrate-mem"     \
-                        "stress-ng-matrix-mult-l1"  \
-                        "stress-ng-matrix-mult-l2"  \
-                        "stress-ng-matrix-mult-l3"  \
-                        "stress-ng-matrix-mult-mem" \
-                        "stress-ng-matrix-trans-l1" \
-                        "stress-ng-matrix-trans-l2" \
-                        "stress-ng-matrix-trans-l3" \
-                        "stress-ng-matrix-trans-mem"\
-                        "stress-ng-matrix-add-l1"   \
-                        "stress-ng-matrix-add-l2"   \
-                        "stress-ng-matrix-add-l3"   \
-                        "stress-ng-matrix-add-mem"  \
-                        "stress-ng-matrix-prod-l1"  \
-                        "stress-ng-matrix-prod-l2"  \
-                        "stress-ng-matrix-prod-l3"  \
-                        "stress-ng-matrix-prod-mem" \
-                        "stress-ng-tree-rb-mem"     \
-                        "stress-ng-tree-binary-mem" \
-                        "stress-ng-heapsort-mem"    \
-                        "stress-ng-mergesort-mem"   \
-                        "stress-ng-qsort-mem"       \
-                        "stress-ng-radixsort-mem"   \
-                        "stress-ng-skiplist-mem"    \
-                        "stress-ng-lsearch-mem"   )
 
