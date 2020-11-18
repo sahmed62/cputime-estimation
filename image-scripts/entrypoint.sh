@@ -33,7 +33,7 @@ if [ ! -z ${PERF_STAT_OUT} ] ; then
                 -a --per-core                   \
                 ${PERF_STAT_EVENT_ARG}          \
                   ${SCRIPT_DIR}/indirection.sh  \
-                  stress-ng-$@
+                  stress-ng-$@ --sched fifo --sched-prio 9
     if [ -f "${PERF_STAT_OUT}.raw" ] ; then
         if [ ! -z "${PERF_STAT_OUTPUT_PARSE_CORELIST}" ] \
             && [ ! -z "${PERF_STAT_OUTPUT_PARSE_EVENTLIST}" ] \
