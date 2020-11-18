@@ -7,6 +7,31 @@ if [ "${CURRENT_USER}" != "0" ] ; then
     exit 1
 fi
 
+# Remove kernel hung-task checks which, ironically, causes hangs
+if [ -f /proc/sys/kernel/hung_task_check_interval_secs ] ; then
+    echo "0" >  /proc/sys/kernel/hung_task_check_interval_secs || true
+fi
+
+if [ -f /proc/sys/kernel/hung_task_timeout_secs ] ; then
+    echo "0" >  /proc/sys/kernel/hung_task_timeout_secs || true
+fi
+
+if [ -f /proc/sys/kernel/hung_task_panic ] ; then
+    echo "0" >  /proc/sys/kernel/hung_task_panic || true
+fi
+
+if [ -f /proc/sys/kernel/hung_task_check_count ] ; then
+    echo "0" > /proc/sys/kernel/hung_task_check_count
+fi
+
+if [ -f /proc/sys/kernel/hung_task_warnings ] ; then
+    echo "0" > /proc/sys/kernel/hung_task_warnings
+fi
+
+if [ -f /sys/module/rcupdate/parameters/rcu_cpu_stall_suppress ] ; then
+    echo "1" >  /sys/module/rcupdate/parameters/rcu_cpu_stall_suppress || true
+fi
+
 # Remove any limits on CPU budget for RT tasks
 if [ -f /proc/sys/kernel/sched_rt_runtime_us ] ; then
     echo "-1" > /proc/sys/kernel/sched_rt_runtime_us
