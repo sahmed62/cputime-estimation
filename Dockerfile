@@ -9,14 +9,16 @@ MAINTAINER Safayet Ahmed <sahmed62@<JHU domain name>>
 
 # install run-time packages
 RUN set -ex \
-        &&  apt update                  \
-        &&  apt install -y              \
-                bc                      \
-                linux-tools-common      \
-                linux-tools-lowlatency  \
+        &&  apt update                          \
+        &&  apt install -y                      \
+                bc                              \
+                linux-tools-common              \
+                linux-tools-lowlatency          \
                 linux-cloud-tools-lowlatency    \
-                stress-ng               \
-        &&  rm -rf /var/lib/apt/lists/* \
+                linux-tools-$(uname -r)         \
+                linux-cloud-tools-$(uname -r)   \
+                stress-ng                       \
+        &&  rm -rf /var/lib/apt/lists/*         \
         &&  mkdir /home/perf-stress-ng
 
 # add scripts
