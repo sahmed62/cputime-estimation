@@ -56,8 +56,11 @@ elif ! grep ' rcu_nocb=' "/proc/cmdline"  >& /dev/null ; then
 elif ! grep ' rcu_nocb_poll' "/proc/cmdline"  >& /dev/null ; then
     echo "WARNING: kernel booted without \"rcu_nocb_poll\" command-line argument"
     echo "          Add \"rcu_nocb_poll\" boot arg to GRUB_CMDLINE_LINUX_DEFAULT in \"/etc/default/grub\" and run update-grub"
+elif ! grep ' processor.max_cstate=0' "/proc/cmdline" >& /dev/null ; then
+    echo "WARNING: kernel booted without \"processor.max_cstate\" command-line argument"
+    echo "          Add \"processor.max_cstate=0\" boot arg to GRUB_CMDLINE_LINUX_DEFAULT in \"/etc/default/grub\" and run update-grub"
 else
-    echo "Kernel booted with CPU isolation, rcu_nocb, and rcu_nocb_poll enabled. Good!"
+    echo "Kernel booted with CPU isolation, rcu_nocb, processor.max_cstate, and rcu_nocb_poll enabled. Good!"
     grep ' isolcpus=' "/proc/cmdline"
 fi
 
