@@ -38,9 +38,10 @@ if [ ! -r ${FIRST_STATFILE} ] ; then
     exit 1
 else
     REFERENCE_HEADER="$(head -n 1 ${FIRST_STATFILE})"
-    echo "Workload, Target Duration (sec), Repetition, ${REFERENCE_HEADER}" >> ${AGGREGATEOUT}
+    echo "Workload, Background, TargetDuration, Repetition, ${REFERENCE_HEADER}" >> ${AGGREGATEOUT}
 fi
 
+background="system-noise"
 # For each workload
 for workload in ${STRESSNG_FUNC_ARRAY[@]} ; do
     # For each duration
@@ -60,7 +61,7 @@ for workload in ${STRESSNG_FUNC_ARRAY[@]} ; do
                     exit 1
                 else
                     STATFILEDATA="$(tail -n 1 ${PERFSTATOUTFILE})"
-                    echo "${workload}, ${d}, ${r}, ${STATFILEDATA}" >> ${AGGREGATEOUT}
+                    echo "${workload}, ${background}, ${d}, ${r}, ${STATFILEDATA}" >> ${AGGREGATEOUT}
                 fi
             fi
         done
