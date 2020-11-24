@@ -1,0 +1,46 @@
+# started on Wed Nov 18 12:40:26 2020
+
+S0-D0-C0;1;13024815565;ns;duration_time;13024815565;100.00;;
+S0-D0-C0;2;1130001274;;cpu-cycles;16282766968;62.52;;
+S0-D0-C0;2;577212147;;instructions;16282633542;62.52;0.51;insn per cycle
+S0-D0-C0;2;121443724;;branch-instructions;16282561738;62.52;;
+S0-D0-C0;2;3444918;;branch-misses;16267893608;62.47;2.84;of all branches
+S0-D0-C0;2;155722857;;L1-icache-loads;16265033220;62.46;;
+S0-D0-C0;2;8218994;;L1-icache-misses;16266241059;62.46;5.28;of all L1-icache hits
+S0-D0-C0;2;269659003;;L1-dcache-loads;16280880095;62.52;;
+S0-D0-C0;2;14110413;;L1-dcache-misses;16283712960;62.53;5.23;of all L1-dcache hits
+S0-D0-C0;1;5276936;;l3_lookup_state.all_l3_req_typs;13020424118;100.00;;
+S0-D0-C0;1;90706515;;xi_ccx_sdp_req1.all_l3_miss_req_typs;13020424539;100.00;;
+S0-D0-C1;0;<not counted>;ns;duration_time;0;100.00;;
+S0-D0-C1;2;556760201;;cpu-cycles;16276739500;62.50;;
+S0-D0-C1;2;281635765;;instructions;16276669654;62.50;0.51;insn per cycle
+S0-D0-C1;2;58149794;;branch-instructions;16276583837;62.50;;
+S0-D0-C1;2;1846474;;branch-misses;16276343115;62.50;3.18;of all branches
+S0-D0-C1;2;101700322;;L1-icache-loads;16276139196;62.50;;
+S0-D0-C1;2;3084881;;L1-icache-misses;16276155709;62.50;3.03;of all L1-icache hits
+S0-D0-C1;2;129374645;;L1-dcache-loads;16276164516;62.50;;
+S0-D0-C1;2;4189455;;L1-dcache-misses;16276115494;62.50;3.24;of all L1-dcache hits
+S0-D0-C1;0;<not counted>;;l3_lookup_state.all_l3_req_typs;0;100.00;;
+S0-D0-C1;0;<not counted>;;xi_ccx_sdp_req1.all_l3_miss_req_typs;0;100.00;;
+S0-D0-C2;0;<not counted>;ns;duration_time;0;100.00;;
+S0-D0-C2;2;35602261158;;cpu-cycles;16276727814;62.50;;
+S0-D0-C2;2;11325887653;;instructions;16276315131;62.50;0.32;insn per cycle
+S0-D0-C2;2;1447846093;;branch-instructions;16276156586;62.50;;
+S0-D0-C2;2;2187512;;branch-misses;16275896950;62.50;0.15;of all branches
+S0-D0-C2;2;138251949;;L1-icache-loads;16276104506;62.50;;
+S0-D0-C2;2;9991840;;L1-icache-misses;16276649627;62.50;7.23;of all L1-icache hits
+S0-D0-C2;2;4120012279;;L1-dcache-loads;16276598664;62.50;;
+S0-D0-C2;2;1442962037;;L1-dcache-misses;16276310902;62.50;35.02;of all L1-dcache hits
+S0-D0-C2;0;<not counted>;;l3_lookup_state.all_l3_req_typs;0;100.00;;
+S0-D0-C2;0;<not counted>;;xi_ccx_sdp_req1.all_l3_miss_req_typs;0;100.00;;
+S0-D0-C3;0;<not counted>;ns;duration_time;0;100.00;;
+S0-D0-C3;2;35661264247;;cpu-cycles;16276728247;62.50;;
+S0-D0-C3;2;52880619726;;instructions;16276650567;62.50;1.48;insn per cycle
+S0-D0-C3;2;8820831988;;branch-instructions;16276475099;62.50;;
+S0-D0-C3;2;20189116;;branch-misses;16276223159;62.50;0.23;of all branches
+S0-D0-C3;2;69067277;;L1-icache-loads;16275976424;62.50;;
+S0-D0-C3;2;3109104;;L1-icache-misses;16276211073;62.50;4.50;of all L1-icache hits
+S0-D0-C3;2;20712904079;;L1-dcache-loads;16276204884;62.50;;
+S0-D0-C3;2;4344443;;L1-dcache-misses;16276205351;62.50;0.02;of all L1-dcache hits
+S0-D0-C3;0;<not counted>;;l3_lookup_state.all_l3_req_typs;0;100.00;;
+S0-D0-C3;0;<not counted>;;xi_ccx_sdp_req1.all_l3_miss_req_typs;0;100.00;;
